@@ -1,0 +1,63 @@
+#!/usr/bin/env osascript
+on run argv
+    set argument to item 1 of argv
+    using terms from application "Spotify"
+        set info to "error"
+        if argument is equal to "play" then
+            tell application "Spotify" to play
+
+        else if argument is equal to "stop" then
+            tell application "Spotify" to pause
+            return "pausd"
+
+        else if argument is equal to "next" then
+            tell application "Spotify" to next track
+
+        else if argument is equal to "previous" or argument is equal to "prev" then
+            tell application "Spotify" to previous track
+
+        else if argument is equal to "volume" then
+            set theNewVolume to item 2 of argv as real
+            if theNewVolume < 0 then set theNewVolume to 0
+            if theNewVolume > 100 then set theNewVolume to 100
+            tell application "Spotify"
+                set sound volume to theNewVolume
+            end tell
+            return "changed volume to: " & theNewVolume
+
+        else if argument is equal to "shuffle" then
+            tell application "Spotify"
+                set isShuffling to not shuffle
+                return "is shuffling: " & isShuffling
+            end tell
+
+        else if argument is equal to "repeat" then
+            tell application "Spotify"
+                set isRepeating to not repeat
+                return "is repeating: " & isRepeating
+            end tell
+            
+        else if argument is equal to "info" then
+            tell application "Spotify"
+                set theTrack to name of current track
+                set theArtist to artist of current track
+                set theAlbum to album of current track
+                set info to "Track info:\n"
+                set info to info & "artist: " & theArtist & "\n"
+                set info to info & "track: " & theTrack & "\n"
+                set info to info & "album: " & theAlbum & "\n"
+                if isShuffling then set info to info & "shuffle is on\n"
+                if isRepeating then set info to info & "repeat is on\n"
+            end tell
+            return info
+        end if
+        
+        tell application "Spotify"
+            set theShuffle to ""
+            if isShuffling then set theShuffle to "[shuffle on]"
+            if player state as text is equal to "playing" then
+                return "playing: " & artist of current track & " - " & name of current track & theShuffle
+            end if
+        end tell
+    end using terms from
+end run
