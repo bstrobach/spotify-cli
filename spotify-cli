@@ -8,7 +8,7 @@ on run argv
 
         else if argument is equal to "stop" then
             tell application "Spotify" to pause
-            return "pausd"
+            return "paused"
 
         else if argument is equal to "next" then
             tell application "Spotify" to next track
