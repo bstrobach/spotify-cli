@@ -1,10 +1,18 @@
 #!/usr/bin/env osascript
 on run argv
+
     set argument to item 1 of argv
     using terms from application "Spotify"
         set info to "error"
-        if argument is equal to "play" then
-            tell application "Spotify" to play
+
+        if argument is equal to "play" or argument is equal to "start" then
+
+            if count of argv is equal to 1 then
+                tell application "Spotify" to play
+            else
+                set url to item 2 of argv
+                tell application "Spotify" to play track url
+            end if
 
         else if argument is equal to "stop" then
             tell application "Spotify" to pause
@@ -51,7 +59,7 @@ on run argv
             end tell
             return info
         end if
-        
+
         tell application "Spotify"
             set theShuffle to ""
             if isShuffling then set theShuffle to "[shuffle on]"
@@ -59,5 +67,7 @@ on run argv
                 return "playing: " & artist of current track & " - " & name of current track & theShuffle
             end if
         end tell
+
     end using terms from
+
 end run
