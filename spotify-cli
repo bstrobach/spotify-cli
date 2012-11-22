@@ -14,7 +14,7 @@ on run argv
                 tell application "Spotify" to play track url
             end if
 
-        else if argument is equal to "stop" then
+        else if argument is equal to "stop" or argument is equal to "pause" then
             tell application "Spotify" to pause
             return "paused"
 
