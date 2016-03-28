@@ -15,6 +15,8 @@ on run argv
     set msg to msg & "  shuffle            - Toggle shuffle\n"
     set msg to msg & "  repeat             - Toggle repeat\n"
     set msg to msg & "  volume N           - Set Volume to N (0...100)\n"
+    set msg to msg & "  increasevolume N   - Increment Volume by N (0...100)\n"
+    set msg to msg & "  decreasevolume N   - Decrement Volume by N (0...100)\n"
     return msg
   end if
 
@@ -29,7 +31,7 @@ on run argv
       else
         set url to item 2 of argv
         tell application "Spotify" to play track url
-      end if  
+      end if
 
     else if argument is equal to "play/pause" then
       tell application "Spotify" to playpause
@@ -61,30 +63,30 @@ on run argv
         set player position to jumpTo
         return "jumped to " & nextMinute as text & "min " & nextSecond as text & "s"
       end tell
-      
+
     else if argument is equal to "forward" or argument is equal to "ff"
       set jump to item 2 of argv as real
       tell application "Spotify"
-        set playerPosition to player position
+        set playerPosition to player position / 1000
         set trackMax to duration of current track
         set jumpTo to playerPosition + jump
-        
+
         if jumpTo > trackMax
           return "cannot jump past track"
         else if jumpTo < 0
           return "really?"
         end if
-        
+
         set nextMinute to round (jumpTo / 60) rounding down
         set nextSecond to round (jumpTo mod 60) rounding down
         set player position to jumpTo
         return "jumped to " & nextMinute as text & "min " & nextSecond as text & "s"
       end tell
-      
+
     else if argument is equal to "rewind" or argument is equal to "rw"
       set jump to item 2 of argv as real
       tell application "Spotify"
-        set playerPosition to player position
+        set playerPosition to player position / 1000
         set trackMax to duration of current track
         set jumpTo to playerPosition - jump
 
@@ -99,7 +101,7 @@ on run argv
         set player position to jumpTo
         return "jumped to " & nextMinute as text & "min " & nextSecond as text & "s"
       end tell
-      
+
     else if argument is equal to "volume" then
       set theNewVolume to item 2 of argv as real
       if theNewVolume < 0 then set theNewVolume to 0
@@ -108,7 +110,29 @@ on run argv
         set sound volume to theNewVolume
       end tell
       return "set volume to " & theNewVolume
-    
+
+    else if argument is equal to "increasevolume" then
+      set increaseVolume to item 2 of argv as real
+      tell application "Spotify"
+        set theCurrentVolume to sound volume
+        set theNewVolume to theCurrentVolume + increaseVolume
+        if theNewVolume < 0 then set theNewVolume to 0
+        if theNewVolume > 100 then set theNewVolume to 100
+        set sound volume to theNewVolume
+      end tell
+      return "set volume to " & theNewVolume
+
+    else if argument is equal to "decreasevolume" then
+      set decreaseVolume to item 2 of argv as real
+      tell application "Spotify"
+        set theCurrentVolume to sound volume
+        set theNewVolume to theCurrentVolume - decreaseVolume
+        if theNewVolume < 0 then set theNewVolume to 0
+        if theNewVolume > 100 then set theNewVolume to 100
+        set sound volume to theNewVolume
+      end tell
+      return "set volume to " & theNewVolume
+
     else if argument is equal to "shuffle" then
       tell application "Spotify"
         set isShuffling to not isShuffling
@@ -120,14 +144,14 @@ on run argv
         set isRepeating to not isRepeating
         return "is repeating: " & isRepeating
       end tell
-      
+
     else if argument is equal to "info" then
-      tell application "Spotify" 
+      tell application "Spotify"
         set theTrack to name of current track
         set theArtist to artist of current track
         set theAlbum to album of current track
-        set trackMinute to round (duration of current track / 60) rounding down
-        set trackSecond to duration of current track mod 60
+        set trackMinute to round ((duration of current track / 1000) / 60) rounding down
+        set trackSecond to round ((duration of current track / 1000) mod 60) rounding down
         set trackTime to trackMinute as text & "min " & trackSecond as text & "s"
         set currentMinute to round (player position / 60) rounding down
         set currentSecond to round (player position mod 60) rounding down
@@ -135,9 +159,9 @@ on run argv
         set info to "Current track:"
         set info to info & "\n Artist:       " & theArtist
         set info to info & "\n Track:        " & theTrack
-        set info to info & "\n Album:        " & theAlbum 
+        set info to info & "\n Album:        " & theAlbum
         set info to info & "\n URI:          " & spotify url of current track
-        set info to info & "\n Duration:     " & trackTime & " ("& duration of current track & " seconds)" 
+        set info to info & "\n Duration:     " & tracktime & " ("& (round ((duration of current track / 1000)) rounding down) & " seconds)"
         set info to info & "\n Currently at: " & currentTime
         set info to info & "\n Player:       " & player state
         set info to info & "\n Volume:       " & sound volume
@@ -146,7 +170,7 @@ on run argv
       end tell
       return info
     end if
-    
+
     tell application "Spotify"
       set shuffling to ""
       if isShuffling then set shuffling to "\n[shuffle on]"
